@@ -27,6 +27,8 @@ class Player(CircleShape):
         self.rotation += PLAYER_TURN_SPEED * dt
 
     def update(self, dt):
+        if self.isPaused == True:
+            return
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:

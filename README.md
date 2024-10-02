@@ -22,6 +22,17 @@
 - Implementing power-ups
 - Creating a hall of fame
 - Adding background music
+- Implement multiple lives and respawning
+- Add an explosion effect for the asteroids
+- Add acceleration to the player movement
+- Make the objects wrap around the screen instead of disappearing
+- Add a background image
+- Create different weapon types
+- Make the asteroids lumpy instead of perfectly round
+- Add a shield power-up
+- Add a speed power-up
+- Add bombs that can be dropped
+- Add Settings menu to change control settings
 
 ## Known Issues
 - Currently, there are no barriers, allowing players to fly off the screen.
