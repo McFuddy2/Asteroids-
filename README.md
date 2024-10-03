@@ -7,6 +7,7 @@
 - Control a ship in an asteroid field.
 - Shoot lasers at approaching asteroids.
 - Move forward and backward to dodge incoming threats.
+- Pause and restart
 
 ## Technologies Used
 - **Python**
@@ -16,6 +17,7 @@
 - **A/D**: Rotate left and right
 - **W/S**: Move forward and backward
 - **SPACE**: Fire gun
+- **ESCAPE**: Open/Close the pause menu
 
 ## Future Enhancements
 - Adding scoring system
@@ -32,11 +34,12 @@
 - Add a shield power-up
 - Add a speed power-up
 - Add bombs that can be dropped
-- Add Settings menu to change control settings
+- Add Settings menu to change control settings and colors
 
 ## Known Issues
 - Currently, there are no barriers, allowing players to fly off the screen.
 - No music is implemented yet.
+- the buttons within the settings menu do nothing, they are entirely visual place holders.
 
 ## Acknowledgments
 Special thanks to **boot.dev** for providing the idea and the backbone of this project.

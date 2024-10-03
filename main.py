@@ -3,6 +3,7 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
+import sqlite3
 from constants import *
 from player import *
 from asteroid import *
