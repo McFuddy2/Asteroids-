@@ -1,7 +1,7 @@
 from circleshape import *
 from constants import *
 from shots import *
-from sql_setup import *
+
 
 class Player(CircleShape):
     def __init__(self, x, y):
@@ -10,6 +10,8 @@ class Player(CircleShape):
         self.rotation = 0
         self.shoot_timer = 0
         self.color = PLAYER_COLOR #get_player_color()
+        self.score = 0
+        self.name = "John Doe"
 
     def get_color_from_db(self):
         # return get_player_color()

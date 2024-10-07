@@ -1,6 +1,8 @@
 import pygame
 from constants import *
-from sql_setup import *
+from datetime import datetime
+import csv
+from helpfulfunctions import *
 
 
 class Button:
@@ -68,9 +70,12 @@ def pause_menu(screen, clock):
 
 
 def main_menu(screen, clock):
-    start_game_button = Button("Start Game", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 40, 200, 50)
-    quit_game_button = Button("Quit Game", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 20, 200, 50)
-    settings_button = Button("Settings", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 80, 200, 50)
+    start_game_button = Button("Start Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 - 40, 200, 50)
+    quit_game_button = Button("Quit Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 20, 200, 50)
+    # add later settings_button = Button("Settings", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 80, 200, 50)
+
+
+    top_ten_scores = get_top_ten_scores()
 
     while True:
         for event in pygame.event.get():
@@ -80,14 +85,14 @@ def main_menu(screen, clock):
 
         # Clear screen
         screen.fill((0, 0, 0))
-        font = pygame.font.Font(None, 74)
-        text_surface = font.render("Main Menu", True, (255, 255, 255))
-        screen.blit(text_surface, (screen.get_width() // 2 - text_surface.get_width() // 2, screen.get_height() // 4))
+        font = pygame.font.Font(None, 120)
+        text_surface = font.render("ASTEROIDS", True, (255, 255, 255))
+        screen.blit(text_surface, (screen.get_width() // 4 - text_surface.get_width() // 2, screen.get_height() // 4))
 
         # Draw buttons
         start_game_button.draw(screen)
         quit_game_button.draw(screen)
-        settings_button.draw(screen)
+        # add later  settings_button.draw(screen)
 
         # Check for button clicks (for now they will not do anything)
         if start_game_button.is_clicked():
@@ -95,19 +100,93 @@ def main_menu(screen, clock):
         if quit_game_button.is_clicked():
             pygame.quit()
             return False
-        if settings_button.is_clicked():
-            print("Settings clicked")
-            return "Settings"
+        # add later  if settings_button.is_clicked():
+            # print("Settings clicked")
+            # return "Settings"
+
+
+        hall_of_fame_font = pygame.font.Font(None, 96)
+        hall_of_fame_title = hall_of_fame_font.render("HALL OF FAME", True, (255, 255, 255))
+        title_x = screen.get_width() * 0.75 - hall_of_fame_title.get_width() // 2
+        title_y = screen.get_height() // 12
+        screen.blit(hall_of_fame_title, (title_x, title_y))
+
+        
+        # Draw a line under the title
+        line_y = title_y + hall_of_fame_title.get_height() + 3  # 10 pixels below the title
+        pygame.draw.line(screen, (255, 255, 255), (title_x - 15, line_y), (title_x + hall_of_fame_title.get_width() + 15, line_y), 1)  # White line with thickness of 1
+        pygame.draw.line(screen, (255, 255, 255), (title_x - 15, line_y + 4), (title_x + hall_of_fame_title.get_width() + 15, line_y +4), 1)
+
+
+        rank_x = screen.get_width() * 0.47  # 60% across the screen, adjust as needed
+        name_x = screen.get_width() * 0.51  # Position for the player names
+        score_x = screen.get_width() * 0.75  # Position for the scores
+        date_x = screen.get_width() * 0.82  # Position for the dates
+
+
+
+        for i, (name, score, date) in enumerate(top_ten_scores):
+            entry_font_size = 50 - (i * 3)
+            font = pygame.font.Font(None, entry_font_size)
+            if i == 0:
+                # Top on Hall Of Fame
+                rank_text = f"#{i + 1}"
+                rank_surface = font.render(rank_text, True, (255, 255, 0))
+                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
+
+                name_surface = font.render(name, True, (255, 255, 0))
+                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
+
+                score_surface = font.render(str(score), True, (255, 255, 0))
+                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
+
+                date_surface = font.render(date, True, (255, 255, 0))
+                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
+            
+            elif i % 2 == 0:
+                # odd entries on Hall of Fame
+                rank_text = f"#{i + 1}"
+                rank_surface = font.render(rank_text, True, (255, 255, 255))
+                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
+
+                name_surface = font.render(name, True, (255, 255, 255))
+                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
+
+                score_surface = font.render(str(score), True, (255, 255, 255))
+                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
+
+                date_surface = font.render(date, True, (255, 255, 255))
+                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
+        
+            elif i % 2 != 0:
+                # even entries on Hall of Fame
+                rank_text = f"#{i + 1}"
+                rank_surface = font.render(rank_text, True, (200, 200, 200))
+                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
+
+                name_surface = font.render(name, True, (200, 200, 200))
+                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
+
+                score_surface = font.render(str(score), True, (200, 200, 200))
+                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
+
+                date_surface = font.render(date, True, (200, 200, 200))
+                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
+
+
 
 
         pygame.display.flip()
         clock.tick(60)
 
+def game_over_menu(screen, clock, player):
+    start_new_game_button = Button("Start New Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 - 40, 200, 50)
+    quit_game_button = Button("Quit Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 20, 200, 50)
+    main_menu_button = Button("Main Menu", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 80, 200, 50)
 
-def game_over_menu(screen, clock,):
-    start_new_game_button = Button("Start New Game", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 40, 200, 50)
-    quit_game_button = Button("Quit Game", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 20, 200, 50)
-    main_menu_button = Button("Main Menu", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 80, 200, 50)
+
+    top_ten_score_menu(screen, player)
+    top_ten_scores = get_top_ten_scores()
 
     while True:
         for event in pygame.event.get():
@@ -116,10 +195,10 @@ def game_over_menu(screen, clock,):
                 return False  # Close the menu and game
 
         # Clear screen
-        screen.fill((255, 0, 0))
+        screen.fill((128, 0, 12))
         font = pygame.font.Font(None, 120)
         text_surface = font.render("GAME OVER", True, (0, 0, 0))
-        screen.blit(text_surface, (screen.get_width() // 2 - text_surface.get_width() // 2, screen.get_height() // 4))
+        screen.blit(text_surface, (screen.get_width() // 4 - text_surface.get_width() // 2, screen.get_height() // 4))
 
         # Draw buttons
         start_new_game_button.draw(screen)
@@ -136,6 +215,80 @@ def game_over_menu(screen, clock,):
         if main_menu_button.is_clicked():
             print("You clicked MAIN MENU")
             return "main_menu"
+
+        score_font = pygame.font.Font(None,64)
+        score_color = (0, 0, 0)    
+        score_text = score_font.render(f"FINAL SCORE: {int(player.score)}", True, score_color)
+        screen.blit(score_text, (screen.get_width() // 4 - score_text.get_width() // 2, screen.get_height() // 8))
+
+        hall_of_fame_font = pygame.font.Font(None, 96)
+        hall_of_fame_title = hall_of_fame_font.render("HALL OF FAME", True, (255, 255, 255))
+        title_x = screen.get_width() * 0.75 - hall_of_fame_title.get_width() // 2
+        title_y = screen.get_height() // 12
+        screen.blit(hall_of_fame_title, (title_x, title_y))
+
+        
+        # Draw a line under the title
+        line_y = title_y + hall_of_fame_title.get_height() + 3  # 10 pixels below the title
+        pygame.draw.line(screen, (255, 255, 255), (title_x - 15, line_y), (title_x + hall_of_fame_title.get_width() + 15, line_y), 1)  # White line with thickness of 1
+        pygame.draw.line(screen, (255, 255, 255), (title_x - 15, line_y + 4), (title_x + hall_of_fame_title.get_width() + 15, line_y +4), 1)
+
+
+        rank_x = screen.get_width() * 0.47  # 60% across the screen, adjust as needed
+        name_x = screen.get_width() * 0.51  # Position for the player names
+        score_x = screen.get_width() * 0.75  # Position for the scores
+        date_x = screen.get_width() * 0.82  # Position for the dates
+
+
+
+        for i, (name, score, date) in enumerate(top_ten_scores):
+            entry_font_size = 50 - (i * 3)
+            font = pygame.font.Font(None, entry_font_size)
+            if i == 0:
+                # Top on Hall Of Fame
+                rank_text = f"#{i + 1}"
+                rank_surface = font.render(rank_text, True, (255, 255, 0))
+                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
+
+                name_surface = font.render(name, True, (255, 255, 0))
+                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
+
+                score_surface = font.render(str(score), True, (255, 255, 0))
+                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
+
+                date_surface = font.render(date, True, (255, 255, 0))
+                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
+            
+            elif i % 2 == 0:
+                # odd entries on Hall of Fame
+                rank_text = f"#{i + 1}"
+                rank_surface = font.render(rank_text, True, (255, 255, 255))
+                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
+
+                name_surface = font.render(name, True, (255, 255, 255))
+                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
+
+                score_surface = font.render(str(score), True, (255, 255, 255))
+                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
+
+                date_surface = font.render(date, True, (255, 255, 255))
+                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
+        
+            elif i % 2 != 0:
+                # even entries on Hall of Fame
+                rank_text = f"#{i + 1}"
+                rank_surface = font.render(rank_text, True, (200, 200, 200))
+                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
+
+                name_surface = font.render(name, True, (200, 200, 200))
+                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
+
+                score_surface = font.render(str(score), True, (200, 200, 200))
+                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
+
+                date_surface = font.render(date, True, (200, 200, 200))
+                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
+
 
         pygame.display.flip()
         clock.tick(60)
@@ -187,3 +340,60 @@ def settings_menu(screen, clock, player):
 
         pygame.display.flip()
         clock.tick(60)
+
+
+
+def top_ten_score_menu(screen, player):
+
+    def add_to_hall_of_fame(player_name, score):
+        current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        with open('halloffame.csv', mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([player_name, score, current_date])
+    
+
+    submit_score_button = Button("Submit", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 30, 200, 50)
+    input_active = True
+    player_name = player.name if player.name else ""
+    
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            if event.type == pygame.KEYDOWN:
+                # Handle text input
+                if input_active:
+                    if event.key == pygame.K_BACKSPACE:
+                        player_name = player_name[:-1]  # Remove last character if backspace is pressed
+                    elif event.key == pygame.K_RETURN:
+                        input_active = False  # Stop input when "Enter" is pressed
+                    elif len(player_name) < 20:  # Limit name length to 15 characters
+                        player_name += event.unicode  # Add typed character to name
+        
+    
+
+        screen.fill((0, 0, 200))
+        font = pygame.font.Font(None, 120)
+        text_surface = font.render("NEW HIGH SCORE", True, (0, 0, 0))
+        screen.blit(text_surface, (screen.get_width() // 2 - text_surface.get_width() // 2, screen.get_height() // 4))
+
+        # Render the input box for player name
+        font = pygame.font.Font(None, 74)
+        name_surface = font.render(player_name, True, (255, 255, 255))
+        input_box = pygame.Rect(SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2, 400, 50)
+        pygame.draw.rect(screen, (255, 255, 255), input_box, 2)  # Draw input box outline
+        screen.blit(name_surface, (input_box.x + 10, input_box.y + 10))
+
+        submit_score_button.draw(screen)
+
+        if submit_score_button.is_clicked():
+            if player_name:  # Ensure the player name is not empty
+                player.name = player_name
+                # Call function to save score, e.g., add_to_hall_of_fame
+                add_to_hall_of_fame(player.name, int(player.score))
+                return
+            
+        pygame.display.flip()

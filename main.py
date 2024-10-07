@@ -3,13 +3,41 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
-import sqlite3
 from constants import *
 from player import *
 from asteroid import *
 from asteroidfield import *
 from shots import *
 from menus import *
+import csv
+from helpfulfunctions import *
+
+
+def create_hall_of_fame():
+    hall_of_fame_file = 'halloffame.csv'
+
+    if not os.path.exists(hall_of_fame_file):
+        with open(hall_of_fame_file, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            # Write header
+            writer.writerow(["Player_Name", "Score", "Date"])
+            # Write initial data
+            initial_data = [
+                ["McFuddy", 1, "2024-10-07 14:44:55"],
+                ["Average Joe", 10, "2024-10-07 15:00:57"],
+                ["Decent Doug", 50, "2024-10-07 15:03:16"],
+                ["Good Gary", 100, "2024-10-07 15:04:42"],
+                ["Impressive Ivan", 250, "2024-10-07 15:06:16"],
+                ["Outstanding Oscar", 500, "2024-10-07 15:10:38"],
+                ["Fantastic Frank", 750, "2024-10-07 15:10:52"],
+                ["Great Greg", 1000, "2024-10-07 15:14:36"],
+                ["Amazing Amy", 1500, "2024-10-07 15:19:59"],
+                ["Incredible Irene", 2500, "2024-10-07 15:22:07"]
+            ]
+            writer.writerows(initial_data)
+            
+
+
 
 
 def main():
@@ -19,6 +47,9 @@ def main():
     print(f"Screen height: {SCREEN_HEIGHT}")
 
     screen =  pygame.display.set_mode(size=(SCREEN_WIDTH, SCREEN_HEIGHT))
+
+    score_font = pygame.font.Font(None,36)
+    score_color = (0, 255, 0)
 
     clock = pygame.time.Clock()
     dt = 0
@@ -71,7 +102,8 @@ def main():
                     if playerCollision == True:
                         print("GAME OVER!")
                         activeGame = False
-                        gameOver = game_over_menu(screen, clock)
+                        gameOver = game_over_menu(screen, clock, player)
+                        print("Game Over 7")
                         if gameOver == True:
                             activeGame = True
                             updatable, drawable, asteroids, shots, player, asteroid_field = start_new_game()  # Reset game
@@ -83,14 +115,22 @@ def main():
                     for shot in shots:
                         shotCollision = obj.collided(shot)
                         if shotCollision == True:
-                            obj.split()
+                            player.score += obj.split() * SCORE_MULTIPLYER
                             shot.kill()
 
                 screen.fill(BACKGROUND_COLOR)
                 
                 for obj in drawable:
                     obj.draw(screen)
-                    
+                
+                player.score = player.score+ (dt * SCORE_MULTIPLYER)
+                
+
+                score_text = score_font.render(f"Score: {int(player.score)}", True, score_color)
+                score_rect = score_text.get_rect(topright=(SCREEN_WIDTH - 20, 20))  # Position at top-right corner
+                screen.blit(score_text, score_rect)
+
+
                 pygame.display.flip()
         playTime = main_menu(screen, clock)
         if playTime == True:
@@ -119,4 +159,5 @@ def start_new_game():
     return updatable, drawable, asteroids, shots, player, asteroid_field
 
 if __name__ == "__main__":
+    create_hall_of_fame()
     main()
