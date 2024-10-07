@@ -20,9 +20,7 @@
 - **ESCAPE**: Open/Close the pause menu
 
 ## Future Enhancements
-- Adding scoring system
 - Implementing power-ups
-- Creating a hall of fame
 - Adding background music
 - Implement multiple lives and respawning
 - Add an explosion effect for the asteroids
