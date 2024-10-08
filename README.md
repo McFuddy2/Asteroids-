@@ -1,5 +1,15 @@
 # ASTEROIDS
 
+## How to open the game
+1. Download the Game
+    Visit the GitHub repository at Asteroids and download the files.
+        https://github.com/McFuddy2/Asteroids-
+2. Open the Project
+    Use a code editor like VSCode to open the downloaded Asteroids folder.
+3. Run the Game
+    Launch the game by running the command:
+        python3 main.py
+
 ## Overview
 **Asteroids** is an exciting game where you play as a ship navigating through an asteroid belt. Your mission is to survive as long as possible by shooting lasers at asteroids or avoiding them. 
 
