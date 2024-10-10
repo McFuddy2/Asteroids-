@@ -137,8 +137,8 @@ def main():
             activeGame = True
         elif playTime == False:
             gameIsRunning = False   
-        elif playTime == "Settings":
-            settings_menu(screen, clock, player)    
+        elif playTime == "Options":
+            options_menu(screen, clock, player)    
                 
 def start_new_game():
     updatable = pygame.sprite.Group()

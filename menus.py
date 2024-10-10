@@ -3,14 +3,18 @@ from constants import *
 from datetime import datetime
 import csv
 from helpfulfunctions import *
+import time 
 
 
 class Button:
-    def __init__(self, text, x, y, width, height):
+    def __init__(self, text, x, y, width, height, color=(200,200,200), hover_color=(150,150,150), font_size=36, click_delay=0.1):
         self.text = text
         self.rect = pygame.Rect(x, y, width, height)
-        self.color = (200, 200, 200)
-        self.hover_color = (150, 150, 150)
+        self.color = color
+        self.hover_color = hover_color
+        self.font_size = font_size
+        self.last_clicked_time = 0
+        self.click_delay = click_delay
 
     def draw(self, screen):
         mouse_pos = pygame.mouse.get_pos()
@@ -19,7 +23,7 @@ class Button:
         else:
             pygame.draw.rect(screen, self.color, self.rect)
 
-        font = pygame.font.Font(None, 36)
+        font = pygame.font.Font(None, self.font_size)
         text_surface = font.render(self.text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=self.rect.center)
         screen.blit(text_surface, text_rect)
@@ -27,6 +31,15 @@ class Button:
     def is_clicked(self):
         mouse_pos = pygame.mouse.get_pos()
         mouse_click = pygame.mouse.get_pressed()
+        current_time = time.time()
+
+        if self.rect.collidepoint(mouse_pos) and mouse_click[0]:
+            if current_time - self.last_clicked_time >= self.click_delay:
+                self.last_clicked_time = current_time
+                return True
+        return False
+
+
         return self.rect.collidepoint(mouse_pos) and mouse_click[0]
 
 # Pause Menu Function
@@ -72,7 +85,7 @@ def pause_menu(screen, clock):
 def main_menu(screen, clock):
     start_game_button = Button("Start Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 - 40, 200, 50)
     quit_game_button = Button("Quit Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 20, 200, 50)
-    # add later settings_button = Button("Settings", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 80, 200, 50)
+    options_button = Button("Options", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 80, 200, 50)
 
 
     top_ten_scores = get_top_ten_scores()
@@ -92,7 +105,7 @@ def main_menu(screen, clock):
         # Draw buttons
         start_game_button.draw(screen)
         quit_game_button.draw(screen)
-        # add later  settings_button.draw(screen)
+        options_button.draw(screen)
 
         # Check for button clicks (for now they will not do anything)
         if start_game_button.is_clicked():
@@ -100,9 +113,9 @@ def main_menu(screen, clock):
         if quit_game_button.is_clicked():
             pygame.quit()
             return False
-        # add later  if settings_button.is_clicked():
-            # print("Settings clicked")
-            # return "Settings"
+        if options_button.is_clicked():
+            print("Options clicked")
+            return "Options"
 
 
         hall_of_fame_font = pygame.font.Font(None, 96)
@@ -293,10 +306,11 @@ def game_over_menu(screen, clock, player):
         pygame.display.flip()
         clock.tick(60)
 
-def settings_menu(screen, clock, player):
-    change_player_color_button = Button("Change Ship Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 40, 400, 50)
-    change_player_bullet_color_button = Button("Change Bullet Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 20, 400, 50)
-    change_background_color_button = Button("Change Background Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 80, 400, 50)
+def options_menu(screen, clock, player):
+    change_player_color_button = Button("Change Ship Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 160, 400, 50)
+    change_player_bullet_color_button = Button("Change Bullet Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 100, 400, 50)
+    change_background_color_button = Button("Change Background Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 40, 400, 50)
+    how_to_play_button = Button("How To Play", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 20, 400, 50)
     back_button = Button("Back", SCREEN_WIDTH // 6, SCREEN_HEIGHT // 2 + 200, 200, 50)
 
 
@@ -309,13 +323,14 @@ def settings_menu(screen, clock, player):
         # Clear screen
         screen.fill((0, 0, 0))
         font = pygame.font.Font(None, 120)
-        text_surface = font.render("Settings", True, (0, 0, 0))
+        text_surface = font.render("Options", True, (0, 0, 0))
         screen.blit(text_surface, (screen.get_width() // 2 - text_surface.get_width() // 2, screen.get_height() // 4))
 
         # Draw buttons
         change_player_color_button.draw(screen)
         change_player_bullet_color_button.draw(screen)
         change_background_color_button.draw(screen)
+        how_to_play_button.draw(screen)
         back_button.draw(screen)
 
      
@@ -335,13 +350,15 @@ def settings_menu(screen, clock, player):
         if change_background_color_button.is_clicked():
             print("background color clicked")
             pass
+        if how_to_play_button.is_clicked():
+            print("How to Play clicked")
+            how_to_play_menu(screen, clock)
+            pass
         if back_button.is_clicked():
             return "main_menu"
 
         pygame.display.flip()
         clock.tick(60)
-
-
 
 def top_ten_score_menu(screen, player):
 
@@ -397,3 +414,66 @@ def top_ten_score_menu(screen, player):
                 return
             
         pygame.display.flip()
+
+def how_to_play_menu(screen, clock):
+    window_size = {"x":900, "y":400}
+    x_close_button = Button("X", SCREEN_WIDTH // 2 + (window_size["x"] // 2) - 25, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) -25, 50, 50, (255,0,0), (153,0,0))
+
+
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False  # Close the menu and game
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return True
+
+        # Dim the screen
+        s = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        s.set_alpha(128) #Transparency level from 0-255
+        s.fill((0, 0, 0))
+        screen.blit(s, (0,0))
+
+        #Draw the small how to window
+        pygame.draw.rect(screen, (200, 200, 200), (SCREEN_WIDTH // 2 - (window_size["x"] // 2), SCREEN_HEIGHT // 2 - (window_size["y"] // 2), window_size["x"], window_size["y"]))
+        
+        # Add some instructions text
+        font = pygame.font.Font(None, 36)
+        how_to_play = ["How to Play:", 
+                        "Use A and D to rotate",
+                        "Use W and S to move forward and backward", 
+                        "Press space to shoot",
+                        "You get points for destroying Asteroids and for the time you have survived", 
+                        "Avoid asteroids and stay alive!",
+                        "",
+                        "TIP: Killing smaller asteroids is worth more points"]
+        
+        for i, line in enumerate(how_to_play):
+            if i == 0:
+                # First line of how_to_play
+                font = pygame.font.Font(None, 64)
+                text_surface = font.render(line, True, (0, 0, 0))
+                screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, SCREEN_HEIGHT // 2 - (window_size["y"] // 2)+10))
+            elif i == len(how_to_play) -1:
+                # last line of how_to play
+                font = pygame.font.Font(None, 24)
+                text_surface = font.render(line, True, (0, 0, 0))
+                screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) + 60 + i * 40))
+            else:
+                # all lines in how_to_play other than first and last
+                font = pygame.font.Font(None, 36)
+                text_surface = font.render(line, True, (0, 0, 0))
+                screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) + 60 + i * 40))
+
+        # Draw button
+        x_close_button.draw(screen)
+
+    
+        if x_close_button.is_clicked():
+            return True
+
+        pygame.display.flip()
+        clock.tick(60)
