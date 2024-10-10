@@ -1,6 +1,7 @@
 from circleshape import *
 from constants import *
 from shots import *
+import csv
 
 
 class Player(CircleShape):
@@ -9,9 +10,11 @@ class Player(CircleShape):
 
         self.rotation = 0
         self.shoot_timer = 0
-        self.color = PLAYER_COLOR #get_player_color()
         self.score = 0
         self.name = "John Doe"
+        self.ship_color = (255,255,255)
+        self.bullet_color = (0,255,0)
+        self.background_color = (0,0,0)
 
     def get_color_from_db(self):
         # return get_player_color()
@@ -27,7 +30,7 @@ class Player(CircleShape):
         return [a, b, c]
     
     def draw(self, screen):
-        pygame.draw.polygon(screen, self.color, self.triangle(), 2)
+        pygame.draw.polygon(screen, self.ship_color, self.triangle(), 2)
         pass
 
     def rotate(self, dt):
@@ -61,7 +64,7 @@ class Player(CircleShape):
         if self.shoot_timer > 0:
             return        
         
-        shot = Shot(self.position.x, self.position.y, SHOT_RADIUS)
+        shot = Shot(self.position.x, self.position.y, SHOT_RADIUS, self.bullet_color)
 
         forward = pygame.Vector2(0, 1).rotate(self.rotation)  
         shot.velocity = forward * PLAYER_SHOOT_SPEED
@@ -72,6 +75,20 @@ class Player(CircleShape):
 
         return shot
     
-    def update_color(self):
-        self.color = self.get_color_from_db()
+    def update_settings(self):
+        try:
+            with open('player_settings.csv', 'r', newline="") as csvfile:
+                reader = csv.reader(csvfile)
+                rows = list(reader)
 
+            if len(rows) > 1:
+                # Assign values from the second row
+                self.name = rows[1][0].strip()  # Player_Name
+                self.ship_color = tuple(map(int, rows[1][1].strip('()').split(',')))  # Convert to tuple of ints
+                self.bullet_color = tuple(map(int, rows[1][2].strip('()').split(',')))  # Convert to tuple of ints
+                self.background_color = tuple(map(int, rows[1][3].strip('()').split(',')))  # Convert to tuple of ints
+
+        except FileNotFoundError:
+            print("Error: player_settings.csv file not found.")
+        except Exception as e:
+            print(f"An error occurred: {e}")

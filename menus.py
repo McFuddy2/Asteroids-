@@ -7,11 +7,12 @@ import time
 
 
 class Button:
-    def __init__(self, text, x, y, width, height, color=(200,200,200), hover_color=(150,150,150), font_size=36, click_delay=0.1):
+    def __init__(self, text, x, y, width, height, color=(200,200,200), hover_color=(150,150,150), text_color=(0,0,0), font_size=36, click_delay=0.1):
         self.text = text
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
         self.hover_color = hover_color
+        self.text_color = text_color
         self.font_size = font_size
         self.last_clicked_time = 0
         self.click_delay = click_delay
@@ -24,7 +25,7 @@ class Button:
             pygame.draw.rect(screen, self.color, self.rect)
 
         font = pygame.font.Font(None, self.font_size)
-        text_surface = font.render(self.text, True, (0, 0, 0))
+        text_surface = font.render(self.text, True, self.text_color)
         text_rect = text_surface.get_rect(center=self.rect.center)
         screen.blit(text_surface, text_rect)
 
@@ -80,7 +81,6 @@ def pause_menu(screen, clock):
 
         pygame.display.flip()
         clock.tick(60)  # Control the frame rate
-
 
 def main_menu(screen, clock):
     start_game_button = Button("Start Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 - 40, 200, 50)
@@ -336,24 +336,23 @@ def options_menu(screen, clock, player):
      
         
         if change_player_color_button.is_clicked():
-            """
-            new_color = (255, 0, 0)  
-            update_player_color(new_color) 
-            player.update_color()  
-            print("Player color changed")
-            """
-            pass
+            new_ship_color = change_ship_color_menu(screen, clock, player.ship_color)
+            player.ship_color = new_ship_color
+            update_player_settings(screen, clock, player)
            
         if change_player_bullet_color_button.is_clicked():
-            print("bullet color clicked")
-            pass
+            new_bullet_color = change_bullet_color_menu(screen, clock, player.bullet_color)
+            player.bullet_color = new_bullet_color
+            update_player_settings(screen, clock, player)
+
         if change_background_color_button.is_clicked():
-            print("background color clicked")
-            pass
+            new_background_color = change_background_color_menu(screen, clock, player.background_color)
+            player.background_color = new_background_color
+            update_player_settings(screen, clock, player)
+
         if how_to_play_button.is_clicked():
-            print("How to Play clicked")
             how_to_play_menu(screen, clock)
-            pass
+
         if back_button.is_clicked():
             return "main_menu"
 
@@ -477,3 +476,213 @@ def how_to_play_menu(screen, clock):
 
         pygame.display.flip()
         clock.tick(60)
+
+def change_background_color_menu(screen, clock, color):
+    window_size = {"x":400, "y":400}
+    button_x = (SCREEN_WIDTH // 4 + 150)
+    x_close_button = Button("X", SCREEN_WIDTH // 2 + (window_size["x"] // 2) - 25, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) -25, 50, 50, (255,0,0), (153,0,0))
+    black_button = Button("Black", button_x, SCREEN_HEIGHT // 2 - 160, 100, 50, (200,200,200), (0,0,0))
+    red_button = Button("Red", button_x, SCREEN_HEIGHT // 2 - 100, 100, 50, (200,200,200), (100,0,0))
+    green_button = Button("Green", button_x, SCREEN_HEIGHT // 2 - 40, 100, 50, (200,200,200), (0,100,0))
+    blue_button = Button("Blue", button_x, SCREEN_HEIGHT // 2 + 20, 100, 50, (200,200,200), (0,0,100))
+    grey_button = Button("Grey", button_x, SCREEN_HEIGHT // 2 + 80, 100, 50,(200,200,200), (50,50,50))
+
+    colors = {
+        "black": (0,0,0), #black
+        "dark red": (100,0,0), #red
+        "dark green": (0,100,0),#green
+        "dark blue": (0,0,100),#blue 
+        "dark grey": (50,50,50) #grey
+    }
+
+    selected_color = color
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False  # Close the menu and game
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return selected_color
+
+        # Dim the screen
+        s = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        s.set_alpha(128) #Transparency level from 0-255
+        s.fill((0, 0, 0))
+        screen.blit(s, (0,0))
+
+        #Draw the small window and the tiny example screen
+        pygame.draw.rect(screen, (100, 100, 100), (SCREEN_WIDTH // 2 - (window_size["x"] // 2), SCREEN_HEIGHT // 2 - (window_size["y"] // 2), window_size["x"], window_size["y"]))
+        pygame.draw.rect(screen, selected_color, ((SCREEN_WIDTH // 2 + (window_size["x"] // 2)-150), SCREEN_HEIGHT // 2 - (window_size["y"] // 2), 150, 150))
+        
+        # Draw button
+        x_close_button.draw(screen)
+        black_button.draw(screen)
+        red_button.draw(screen)
+        green_button.draw(screen)
+        blue_button.draw(screen)
+        grey_button.draw(screen)
+
+    
+        if x_close_button.is_clicked():
+            return selected_color
+        if black_button.is_clicked():
+            selected_color = colors["black"]
+        if red_button.is_clicked():
+            selected_color = colors["dark red"]
+        if green_button.is_clicked():
+            selected_color = colors["dark green"]
+        if blue_button.is_clicked():
+            selected_color = colors["dark blue"]
+        if grey_button.is_clicked():
+            selected_color = colors["dark grey"]
+
+
+    
+
+        pygame.display.flip()
+        clock.tick(60)    
+
+    return selected_color
+
+def change_bullet_color_menu(screen, clock, color):
+    window_size = {"x":400, "y":400}
+    button_x = (SCREEN_WIDTH // 4 + 150)
+    x_close_button = Button("X", SCREEN_WIDTH // 2 + (window_size["x"] // 2) - 25, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) -25, 50, 50, (255,0,0), (153,0,0))
+    white_button = Button("White", button_x, SCREEN_HEIGHT // 2 - 160, 100, 50, (200,200,200), (255,255,255))
+    red_button = Button("Red", button_x, SCREEN_HEIGHT // 2 - 100, 100, 50, (200,200,200), (255,0,0))
+    green_button = Button("Green", button_x, SCREEN_HEIGHT // 2 - 40, 100, 50, (200,200,200), (0,255,0))
+    blue_button = Button("Blue", button_x, SCREEN_HEIGHT // 2 + 20, 100, 50, (200,200,200), (0,0,255))
+    grey_button = Button("Grey", button_x, SCREEN_HEIGHT // 2 + 80, 100, 50,(200,200,200), (150,150,150))
+
+    colors = {
+        "white": (255,255,255), #black
+        "red": (255,0,0), #red
+        "green": (0,255,0),#green
+        "blue": (0,0,255),#blue 
+        "grey": (150,150,150) #grey
+    }
+
+    selected_color = color
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False  # Close the menu and game
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return selected_color
+
+        # Dim the screen
+        s = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        s.set_alpha(128) #Transparency level from 0-255
+        s.fill((0, 0, 0))
+        screen.blit(s, (0,0))
+
+        #Draw the small window and the tiny example screen
+        pygame.draw.rect(screen, (100, 100, 100), (SCREEN_WIDTH // 2 - (window_size["x"] // 2), SCREEN_HEIGHT // 2 - (window_size["y"] // 2), window_size["x"], window_size["y"]))
+        pygame.draw.rect(screen, selected_color, ((SCREEN_WIDTH // 2 + (window_size["x"] // 2)-150), SCREEN_HEIGHT // 2 - (window_size["y"] // 2), 150, 150))
+        
+        # Draw button
+        x_close_button.draw(screen)
+        white_button.draw(screen)
+        red_button.draw(screen)
+        green_button.draw(screen)
+        blue_button.draw(screen)
+        grey_button.draw(screen)
+
+    
+        if x_close_button.is_clicked():
+            return selected_color
+        if white_button.is_clicked():
+            selected_color = colors["white"]
+        if red_button.is_clicked():
+            selected_color = colors["red"]
+        if green_button.is_clicked():
+            selected_color = colors["green"]
+        if blue_button.is_clicked():
+            selected_color = colors["blue"]
+        if grey_button.is_clicked():
+            selected_color = colors["grey"]
+
+
+    
+
+        pygame.display.flip()
+        clock.tick(60)    
+
+    return selected_color
+
+def change_ship_color_menu(screen, clock, color):
+    window_size = {"x":400, "y":400}
+    button_x = (SCREEN_WIDTH // 4 + 150)
+    x_close_button = Button("X", SCREEN_WIDTH // 2 + (window_size["x"] // 2) - 25, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) -25, 50, 50, (255,0,0), (153,0,0))
+    white_button = Button("White", button_x, SCREEN_HEIGHT // 2 - 160, 100, 50, (200,200,200), (255,255,255))
+    red_button = Button("Red", button_x, SCREEN_HEIGHT // 2 - 100, 100, 50, (200,200,200), (255,0,0))
+    green_button = Button("Green", button_x, SCREEN_HEIGHT // 2 - 40, 100, 50, (200,200,200), (0,255,0))
+    blue_button = Button("Blue", button_x, SCREEN_HEIGHT // 2 + 20, 100, 50, (200,200,200), (0,0,255))
+    grey_button = Button("Grey", button_x, SCREEN_HEIGHT // 2 + 80, 100, 50,(200,200,200), (150,150,150))
+
+    colors = {
+        "white": (255,255,255), #black
+        "red": (255,0,0), #red
+        "green": (0,255,0),#green
+        "blue": (0,0,255),#blue 
+        "grey": (150,150,150) #grey
+    }
+
+    selected_color = color
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False  # Close the menu and game
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return selected_color
+
+        # Dim the screen
+        s = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        s.set_alpha(128) #Transparency level from 0-255
+        s.fill((0, 0, 0))
+        screen.blit(s, (0,0))
+
+        #Draw the small window and the tiny example screen
+        pygame.draw.rect(screen, (100, 100, 100), (SCREEN_WIDTH // 2 - (window_size["x"] // 2), SCREEN_HEIGHT // 2 - (window_size["y"] // 2), window_size["x"], window_size["y"]))
+        pygame.draw.rect(screen, selected_color, ((SCREEN_WIDTH // 2 + (window_size["x"] // 2)-150), SCREEN_HEIGHT // 2 - (window_size["y"] // 2), 150, 150))
+        
+        # Draw button
+        x_close_button.draw(screen)
+        white_button.draw(screen)
+        red_button.draw(screen)
+        green_button.draw(screen)
+        blue_button.draw(screen)
+        grey_button.draw(screen)
+
+    
+        if x_close_button.is_clicked():
+            return selected_color
+        if white_button.is_clicked():
+            selected_color = colors["white"]
+        if red_button.is_clicked():
+            selected_color = colors["red"]
+        if green_button.is_clicked():
+            selected_color = colors["green"]
+        if blue_button.is_clicked():
+            selected_color = colors["blue"]
+        if grey_button.is_clicked():
+            selected_color = colors["grey"]
+
+
+    
+
+        pygame.display.flip()
+        clock.tick(60)    
+
+    return selected_color

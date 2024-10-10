@@ -42,12 +42,12 @@
 - Add a shield power-up
 - Add a speed power-up
 - Add bombs that can be dropped
-- Add Settings menu to change control settings and colors
+- Add Options menu to change control settings and player colors
 
 ## Known Issues
 - Currently, there are no barriers, allowing players to fly off the screen.
 - No music is implemented yet.
-- the buttons within the settings menu do nothing, they are entirely visual place holders.
+- the buttons within the options menu do nothing, they are entirely visual place holders.
 
 ## Acknowledgments
 Special thanks to **boot.dev** for providing the idea and the backbone of this project.

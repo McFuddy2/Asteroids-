@@ -118,7 +118,7 @@ def main():
                             player.score += obj.split() * SCORE_MULTIPLYER
                             shot.kill()
 
-                screen.fill(BACKGROUND_COLOR)
+                screen.fill(player.background_color)
                 
                 for obj in drawable:
                     obj.draw(screen)
@@ -155,6 +155,7 @@ def start_new_game():
     Shot.containers = (shots, updatable, drawable)
 
     player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+    player.update_settings()
 
     return updatable, drawable, asteroids, shots, player, asteroid_field
 

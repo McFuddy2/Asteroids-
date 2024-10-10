@@ -24,3 +24,15 @@ def get_top_ten_scores():
     except FileNotFoundError:
         print("Hall Of Fame Not Found")
     return hall_of_fame[:10]
+
+
+def update_player_settings(screen, clock, player):
+    with open('player_settings.csv', 'r', newline="") as csvfile:
+        reader = csv.reader(csvfile)
+        rows= list(reader)
+    if len(rows) > 1:
+        rows[1] = [player.name, player.ship_color, player.bullet_color, player.background_color]
+    
+    with open('player_settings.csv', 'w', newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(rows)
