@@ -5,16 +5,19 @@ import csv
 
 
 class Player(CircleShape):
-    def __init__(self, x, y):
-        super().__init__(x, y, PLAYER_RADIUS)
+    def __init__(self, x, y, game):
+        super().__init__(x, y, game.player_radius)
 
+        self.game = game
+        self.radius = game.player_radius
         self.rotation = 0
         self.shoot_timer = 0
         self.score = 0
-        self.name = "John Doe"
+        self.name = "Buzz Lightyear"
         self.ship_color = (255,255,255)
         self.bullet_color = (0,255,0)
         self.background_color = (0,0,0)
+        self.lives = 1
 
     def get_color_from_db(self):
         # return get_player_color()
@@ -34,7 +37,7 @@ class Player(CircleShape):
         pass
 
     def rotate(self, dt):
-        self.rotation += PLAYER_TURN_SPEED * dt
+        self.rotation += self.game.player_turn_speed * dt
 
     def update(self, dt):
         keys = pygame.key.get_pressed()       
@@ -58,19 +61,29 @@ class Player(CircleShape):
 
     def move(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.position += forward * PLAYER_SPEED * dt
+        self.position += forward * self.game.player_movement_speed * dt
 
     def shoot(self):
         if self.shoot_timer > 0:
             return        
         
-        shot = Shot(self.position.x, self.position.y, SHOT_RADIUS, self.bullet_color)
+        shot = Shot(self.position.x, self.position.y, self.game.shot_radius, self.bullet_color)
 
         forward = pygame.Vector2(0, 1).rotate(self.rotation)  
-        shot.velocity = forward * PLAYER_SHOOT_SPEED
+        shot.velocity = forward * self.game.player_shot_speed
 
-        self.shoot_timer = PLAYER_SHOOT_COOLDOWN
+        self.shoot_timer = self.game.player_shoot_cooldown
 
+        if self.game.shot_radius == 5:
+                shot_channel = pygame.mixer.Channel(1)
+                normal_shot_sound = pygame.mixer.Sound(NORMAL_SHOT_PATH)
+                shot_channel.play(normal_shot_sound)
+                normal_shot_sound.set_volume(self.game.sound_effect_volume)
+        elif self.game.shot_radius > 5:
+                shot_channel = pygame.mixer.Channel(1)
+                big_shot_sound = pygame.mixer.Sound(BIG_SHOT_PATH)
+                shot_channel.play(big_shot_sound)
+                big_shot_sound.set_volume(self.game.sound_effect_volume)
 
 
         return shot

@@ -4,6 +4,7 @@ from datetime import datetime
 import csv
 from helpfulfunctions import *
 import time 
+import math
 
 
 class Button:
@@ -45,6 +46,7 @@ class Button:
 
 # Pause Menu Function
 def pause_menu(screen, clock):
+    change_music(MENU_MUSIC_PATH)
     close_menu_button = Button("Close Menu", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2, 200, 50)
     quit_game_button = Button("Quit Game", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 60, 200, 50)
     main_menu_button = Button("Main Menu", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 120, 200, 50)
@@ -83,6 +85,7 @@ def pause_menu(screen, clock):
         clock.tick(60)  # Control the frame rate
 
 def main_menu(screen, clock):
+    window_opened_time = time.time()
     start_game_button = Button("Start Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 - 40, 200, 50)
     quit_game_button = Button("Quit Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 20, 200, 50)
     options_button = Button("Options", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 80, 200, 50)
@@ -108,91 +111,23 @@ def main_menu(screen, clock):
         options_button.draw(screen)
 
         # Check for button clicks (for now they will not do anything)
-        if start_game_button.is_clicked():
+        if start_game_button.is_clicked() and (time.time() - window_opened_time)> .1:
             return True  # This can be changed to start the game later
-        if quit_game_button.is_clicked():
+        if quit_game_button.is_clicked() and (time.time() - window_opened_time)> .1:
             pygame.quit()
             return False
-        if options_button.is_clicked():
+        if options_button.is_clicked() and (time.time() - window_opened_time)> .1:
             print("Options clicked")
             return "Options"
 
 
-        hall_of_fame_font = pygame.font.Font(None, 96)
-        hall_of_fame_title = hall_of_fame_font.render("HALL OF FAME", True, (255, 255, 255))
-        title_x = screen.get_width() * 0.75 - hall_of_fame_title.get_width() // 2
-        title_y = screen.get_height() // 12
-        screen.blit(hall_of_fame_title, (title_x, title_y))
-
-        
-        # Draw a line under the title
-        line_y = title_y + hall_of_fame_title.get_height() + 3  # 10 pixels below the title
-        pygame.draw.line(screen, (255, 255, 255), (title_x - 15, line_y), (title_x + hall_of_fame_title.get_width() + 15, line_y), 1)  # White line with thickness of 1
-        pygame.draw.line(screen, (255, 255, 255), (title_x - 15, line_y + 4), (title_x + hall_of_fame_title.get_width() + 15, line_y +4), 1)
-
-
-        rank_x = screen.get_width() * 0.47  # 60% across the screen, adjust as needed
-        name_x = screen.get_width() * 0.51  # Position for the player names
-        score_x = screen.get_width() * 0.75  # Position for the scores
-        date_x = screen.get_width() * 0.82  # Position for the dates
-
-
-
-        for i, (name, score, date) in enumerate(top_ten_scores):
-            entry_font_size = 50 - (i * 3)
-            font = pygame.font.Font(None, entry_font_size)
-            if i == 0:
-                # Top on Hall Of Fame
-                rank_text = f"#{i + 1}"
-                rank_surface = font.render(rank_text, True, (255, 255, 0))
-                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
-
-                name_surface = font.render(name, True, (255, 255, 0))
-                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
-
-                score_surface = font.render(str(score), True, (255, 255, 0))
-                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
-
-                date_surface = font.render(date, True, (255, 255, 0))
-                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
-            
-            elif i % 2 == 0:
-                # odd entries on Hall of Fame
-                rank_text = f"#{i + 1}"
-                rank_surface = font.render(rank_text, True, (255, 255, 255))
-                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
-
-                name_surface = font.render(name, True, (255, 255, 255))
-                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
-
-                score_surface = font.render(str(score), True, (255, 255, 255))
-                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
-
-                date_surface = font.render(date, True, (255, 255, 255))
-                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
-        
-            elif i % 2 != 0:
-                # even entries on Hall of Fame
-                rank_text = f"#{i + 1}"
-                rank_surface = font.render(rank_text, True, (200, 200, 200))
-                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
-
-                name_surface = font.render(name, True, (200, 200, 200))
-                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
-
-                score_surface = font.render(str(score), True, (200, 200, 200))
-                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
-
-                date_surface = font.render(date, True, (200, 200, 200))
-                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
-
-
-
+        display_hall_of_fame(screen, top_ten_scores)
 
         pygame.display.flip()
         clock.tick(60)
 
 def game_over_menu(screen, clock, player):
+    change_music(MENU_MUSIC_PATH)
     start_new_game_button = Button("Start New Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 - 40, 200, 50)
     quit_game_button = Button("Quit Game", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 20, 200, 50)
     main_menu_button = Button("Main Menu", (screen.get_width() // 4 - 100), SCREEN_HEIGHT // 2 + 80, 200, 50)
@@ -207,112 +142,45 @@ def game_over_menu(screen, clock, player):
                 pygame.quit()
                 return False  # Close the menu and game
 
-        # Clear screen
+       
         screen.fill((128, 0, 12))
         font = pygame.font.Font(None, 120)
         text_surface = font.render("GAME OVER", True, (0, 0, 0))
         screen.blit(text_surface, (screen.get_width() // 4 - text_surface.get_width() // 2, screen.get_height() // 4))
+
+        final_score_font = pygame.font.Font(None, 50)
+        final_score_text = final_score_font.render(f"Final Score: {math.floor(player.score)}", True, (0, 0, 0))
+        screen.blit(final_score_text, (screen.get_width() // 4 - final_score_text.get_width() // 2, screen.get_height() // 8))
 
         # Draw buttons
         start_new_game_button.draw(screen)
         quit_game_button.draw(screen)
         main_menu_button.draw(screen)
 
-        # Check for button clicks (for now they will not do anything)
         if start_new_game_button.is_clicked():
-            print("Start New Game clicked")
-            return True  # This can be changed to start the game later
+            return True 
         if quit_game_button.is_clicked():
             pygame.quit()
             return False
         if main_menu_button.is_clicked():
-            print("You clicked MAIN MENU")
             return "main_menu"
 
-        score_font = pygame.font.Font(None,64)
-        score_color = (0, 0, 0)    
-        score_text = score_font.render(f"FINAL SCORE: {int(player.score)}", True, score_color)
-        screen.blit(score_text, (screen.get_width() // 4 - score_text.get_width() // 2, screen.get_height() // 8))
-
-        hall_of_fame_font = pygame.font.Font(None, 96)
-        hall_of_fame_title = hall_of_fame_font.render("HALL OF FAME", True, (255, 255, 255))
-        title_x = screen.get_width() * 0.75 - hall_of_fame_title.get_width() // 2
-        title_y = screen.get_height() // 12
-        screen.blit(hall_of_fame_title, (title_x, title_y))
-
-        
-        # Draw a line under the title
-        line_y = title_y + hall_of_fame_title.get_height() + 3  # 10 pixels below the title
-        pygame.draw.line(screen, (255, 255, 255), (title_x - 15, line_y), (title_x + hall_of_fame_title.get_width() + 15, line_y), 1)  # White line with thickness of 1
-        pygame.draw.line(screen, (255, 255, 255), (title_x - 15, line_y + 4), (title_x + hall_of_fame_title.get_width() + 15, line_y +4), 1)
-
-
-        rank_x = screen.get_width() * 0.47  # 60% across the screen, adjust as needed
-        name_x = screen.get_width() * 0.51  # Position for the player names
-        score_x = screen.get_width() * 0.75  # Position for the scores
-        date_x = screen.get_width() * 0.82  # Position for the dates
-
-
-
-        for i, (name, score, date) in enumerate(top_ten_scores):
-            entry_font_size = 50 - (i * 3)
-            font = pygame.font.Font(None, entry_font_size)
-            if i == 0:
-                # Top on Hall Of Fame
-                rank_text = f"#{i + 1}"
-                rank_surface = font.render(rank_text, True, (255, 255, 0))
-                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
-
-                name_surface = font.render(name, True, (255, 255, 0))
-                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
-
-                score_surface = font.render(str(score), True, (255, 255, 0))
-                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
-
-                date_surface = font.render(date, True, (255, 255, 0))
-                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
-            
-            elif i % 2 == 0:
-                # odd entries on Hall of Fame
-                rank_text = f"#{i + 1}"
-                rank_surface = font.render(rank_text, True, (255, 255, 255))
-                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
-
-                name_surface = font.render(name, True, (255, 255, 255))
-                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
-
-                score_surface = font.render(str(score), True, (255, 255, 255))
-                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
-
-                date_surface = font.render(date, True, (255, 255, 255))
-                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
-        
-            elif i % 2 != 0:
-                # even entries on Hall of Fame
-                rank_text = f"#{i + 1}"
-                rank_surface = font.render(rank_text, True, (200, 200, 200))
-                screen.blit(rank_surface, (rank_x, (120 + i * 45)+10))  
-
-                name_surface = font.render(name, True, (200, 200, 200))
-                screen.blit(name_surface, (name_x, (120 + i * 45)+10))
-
-                score_surface = font.render(str(score), True, (200, 200, 200))
-                screen.blit(score_surface, (score_x, (120 + i * 45)+10))
-
-                date_surface = font.render(date, True, (200, 200, 200))
-                screen.blit(date_surface, (date_x, (120 + i * 45)+10))
+        display_hall_of_fame(screen, top_ten_scores)
 
 
         pygame.display.flip()
         clock.tick(60)
 
-def options_menu(screen, clock, player):
+def options_menu(screen, clock, player, game):
+    window_opened_time = time.time()
     change_player_color_button = Button("Change Ship Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 160, 400, 50)
     change_player_bullet_color_button = Button("Change Bullet Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 100, 400, 50)
     change_background_color_button = Button("Change Background Color", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 - 40, 400, 50)
     how_to_play_button = Button("How To Play", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 20, 400, 50)
+    music_button = Button("Music Settings", SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + 80, 400, 50)
     back_button = Button("Back", SCREEN_WIDTH // 6, SCREEN_HEIGHT // 2 + 200, 200, 50)
 
+    
 
     while True:
         for event in pygame.event.get():
@@ -331,29 +199,33 @@ def options_menu(screen, clock, player):
         change_player_bullet_color_button.draw(screen)
         change_background_color_button.draw(screen)
         how_to_play_button.draw(screen)
+        music_button.draw(screen)
         back_button.draw(screen)
-
-     
         
-        if change_player_color_button.is_clicked():
+        if change_player_color_button.is_clicked() and (time.time() - window_opened_time)> .1:
             new_ship_color = change_ship_color_menu(screen, clock, player.ship_color)
             player.ship_color = new_ship_color
-            update_player_settings(screen, clock, player)
+            update_player_settings(player)
            
-        if change_player_bullet_color_button.is_clicked():
+        if change_player_bullet_color_button.is_clicked() and (time.time() - window_opened_time)> .1:
             new_bullet_color = change_bullet_color_menu(screen, clock, player.bullet_color)
             player.bullet_color = new_bullet_color
-            update_player_settings(screen, clock, player)
+            update_player_settings(player)
 
-        if change_background_color_button.is_clicked():
+        if change_background_color_button.is_clicked() and (time.time() - window_opened_time)> .1:
             new_background_color = change_background_color_menu(screen, clock, player.background_color)
             player.background_color = new_background_color
-            update_player_settings(screen, clock, player)
+            update_player_settings(player)
 
-        if how_to_play_button.is_clicked():
+        if music_button.is_clicked() and (time.time() - window_opened_time)> .1:
+            game.music_volume, game.sound_effect_volume = change_music_settings_menu(screen, clock, game)
+            update_game_settings(game)
+            
+
+        if how_to_play_button.is_clicked()  and (time.time() - window_opened_time)> .1:
             how_to_play_menu(screen, clock)
 
-        if back_button.is_clicked():
+        if back_button.is_clicked()  and (time.time() - window_opened_time) > .1:
             return "main_menu"
 
         pygame.display.flip()
@@ -369,7 +241,7 @@ def top_ten_score_menu(screen, player):
             writer.writerow([player_name, score, current_date])
     
 
-    submit_score_button = Button("Submit", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 30, 200, 50)
+    submit_score_button = Button("Submit", SCREEN_WIDTH // 2, SCREEN_HEIGHT *.75 + 25, 200, 50)
     input_active = True
     player_name = player.name if player.name else ""
     
@@ -385,10 +257,14 @@ def top_ten_score_menu(screen, player):
                     if event.key == pygame.K_BACKSPACE:
                         player_name = player_name[:-1]  # Remove last character if backspace is pressed
                     elif event.key == pygame.K_RETURN:
-                        input_active = False  # Stop input when "Enter" is pressed
+                        if player_name:  # Ensure the player name is not empty
+                            player.name = player_name
+                            add_to_hall_of_fame(player.name, int(player.score))
+                            return
                     elif len(player_name) < 20:  # Limit name length to 15 characters
                         player_name += event.unicode  # Add typed character to name
-        
+        player.name = player_name
+        update_player_settings(player)
     
 
         screen.fill((0, 0, 200))
@@ -415,7 +291,7 @@ def top_ten_score_menu(screen, player):
         pygame.display.flip()
 
 def how_to_play_menu(screen, clock):
-    window_size = {"x":900, "y":400}
+    window_size = {"x":1000, "y":400}
     x_close_button = Button("X", SCREEN_WIDTH // 2 + (window_size["x"] // 2) - 25, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) -25, 50, 50, (255,0,0), (153,0,0))
 
 
@@ -446,6 +322,7 @@ def how_to_play_menu(screen, clock):
                         "Use W and S to move forward and backward", 
                         "Press space to shoot",
                         "You get points for destroying Asteroids and for the time you have survived", 
+                        "Destroyed Asteroids have a chance to drop an item. Some are good, others are not",
                         "Avoid asteroids and stay alive!",
                         "",
                         "TIP: Killing smaller asteroids is worth more points"]
@@ -480,20 +357,19 @@ def how_to_play_menu(screen, clock):
 def change_background_color_menu(screen, clock, color):
     window_size = {"x":400, "y":400}
     button_x = (SCREEN_WIDTH // 4 + 150)
-    x_close_button = Button("X", SCREEN_WIDTH // 2 + (window_size["x"] // 2) - 25, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) -25, 50, 50, (255,0,0), (153,0,0))
-    black_button = Button("Black", button_x, SCREEN_HEIGHT // 2 - 160, 100, 50, (200,200,200), (0,0,0))
-    red_button = Button("Red", button_x, SCREEN_HEIGHT // 2 - 100, 100, 50, (200,200,200), (100,0,0))
-    green_button = Button("Green", button_x, SCREEN_HEIGHT // 2 - 40, 100, 50, (200,200,200), (0,100,0))
-    blue_button = Button("Blue", button_x, SCREEN_HEIGHT // 2 + 20, 100, 50, (200,200,200), (0,0,100))
-    grey_button = Button("Grey", button_x, SCREEN_HEIGHT // 2 + 80, 100, 50,(200,200,200), (50,50,50))
-
     colors = {
         "black": (0,0,0), #black
-        "dark red": (100,0,0), #red
-        "dark green": (0,100,0),#green
-        "dark blue": (0,0,100),#blue 
-        "dark grey": (50,50,50) #grey
+        "dark red": (30,0,0), #red
+        "dark green": (0,30,0),#green
+        "dark blue": (0,0,30),#blue 
+        "dark grey": (25,25,25) #grey
     }
+    x_close_button = Button("X", SCREEN_WIDTH // 2 + (window_size["x"] // 2) - 25, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) -25, 50, 50, (255,0,0), (153,0,0))
+    black_button = Button("Black", button_x, SCREEN_HEIGHT // 2 - 160, 100, 50, (200,200,200), colors["black"])
+    red_button = Button("Red", button_x, SCREEN_HEIGHT // 2 - 100, 100, 50, (200,200,200), colors["dark red"])
+    green_button = Button("Green", button_x, SCREEN_HEIGHT // 2 - 40, 100, 50, (200,200,200), colors["dark green"])
+    blue_button = Button("Blue", button_x, SCREEN_HEIGHT // 2 + 20, 100, 50, (200,200,200), colors["dark blue"])
+    grey_button = Button("Grey", button_x, SCREEN_HEIGHT // 2 + 80, 100, 50,(200,200,200), colors["dark grey"])
 
     selected_color = color
 
@@ -686,3 +562,113 @@ def change_ship_color_menu(screen, clock, color):
         clock.tick(60)    
 
     return selected_color
+
+def change_music_settings_menu(screen, clock, game):
+    window_opened_time = time.time()
+
+    rows_of_buttons = 2
+    button_size = {"x":250, "y":50}
+    window_size = {"x":(button_size["x"]* 2 + 150), "y":(button_size["y"] * rows_of_buttons + (100+ (rows_of_buttons*10)))}
+    
+    x_close_button = Button("X", SCREEN_WIDTH // 2 + (window_size["x"] // 2) - 25, SCREEN_HEIGHT // 2 - (window_size["y"] // 2) -25, 50, 50, (255,0,0), (153,0,0))
+    
+    button_x1_coord = (SCREEN_WIDTH // 2 - (window_size["x"]//2) + 25)
+    button_x2_coord = (button_x1_coord + button_size["x"] + 25)
+    button_y_coord = (SCREEN_HEIGHT // 2 - (window_size["y"]//2) + 50)
+
+    music_volume_up_button = Button("Music +", button_x1_coord, button_y_coord, button_size["x"],button_size["y"])
+    music_volume_down_button = Button("Music -", button_x2_coord, button_y_coord, button_size["x"],button_size["y"])
+    
+    sound_effects_volume_up_button = Button("Sound Effects +", button_x1_coord, button_y_coord + button_size["y"] + 10, button_size["x"],button_size["y"])
+    sound_effects_volume_down_button = Button("Sound Effects -", button_x2_coord, button_y_coord + button_size["y"] + 10, button_size["x"],button_size["y"])
+    
+
+    selected_music_volume = game.music_volume
+    selected_sound_effect_volume = game.sound_effect_volume
+    
+    pygame.font.init()
+    font = pygame.font.Font(None, 46)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False  # Close the menu and game
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return selected_music_volume, selected_sound_effect_volume
+
+        # Dim the screen
+        s = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        s.set_alpha(128) #Transparency level from 0-255
+        s.fill((0, 0, 0))
+        screen.blit(s, (0,0))
+
+        #Draw the small window and the tiny example screen
+        pygame.draw.rect(screen, (100, 100, 100), (SCREEN_WIDTH // 2 - (window_size["x"] // 2), SCREEN_HEIGHT // 2 - (window_size["y"] // 2), window_size["x"], window_size["y"]))
+               
+        # Draw button
+        x_close_button.draw(screen)
+        music_volume_up_button.draw(screen)
+        music_volume_down_button.draw(screen)
+        sound_effects_volume_up_button.draw(screen)
+        sound_effects_volume_down_button.draw(screen)
+
+
+
+        if x_close_button.is_clicked() and (time.time() - window_opened_time)> .1:
+            return selected_music_volume, selected_sound_effect_volume
+        
+        if music_volume_up_button.is_clicked() and (time.time() - window_opened_time)> .1:
+            if selected_music_volume < .9:
+                selected_music_volume += .1
+                pygame.mixer.music.set_volume(selected_music_volume)
+            else:
+                selected_music_volume = 1.0
+                pygame.mixer.music.set_volume(selected_music_volume)
+                
+        if music_volume_down_button.is_clicked() and (time.time() - window_opened_time)> .1:
+            if selected_music_volume > .1:
+                selected_music_volume -= .1
+                pygame.mixer.music.set_volume(selected_music_volume)
+            else:
+                selected_music_volume = 0.0
+                pygame.mixer.music.set_volume(selected_music_volume)
+        
+        if sound_effects_volume_up_button.is_clicked() and (time.time() - window_opened_time)> .1:
+            if selected_sound_effect_volume < .27:
+                selected_sound_effect_volume += .03
+                normal_shot_sound = pygame.mixer.Sound(NORMAL_SHOT_PATH)
+                pygame.mixer.Channel(1).set_volume(selected_sound_effect_volume)
+                pygame.mixer.Channel(1).play(normal_shot_sound)
+            else:
+                selected_sound_effect_volume = .3
+                normal_shot_sound = pygame.mixer.Sound(NORMAL_SHOT_PATH)
+                pygame.mixer.Channel(1).set_volume(selected_sound_effect_volume)
+                pygame.mixer.Channel(1).play(normal_shot_sound)
+
+        if sound_effects_volume_down_button.is_clicked() and (time.time() - window_opened_time)> .1:
+            if selected_sound_effect_volume > .03:
+                selected_sound_effect_volume -= .03
+                normal_shot_sound = pygame.mixer.Sound(NORMAL_SHOT_PATH)
+                pygame.mixer.Channel(1).set_volume(selected_sound_effect_volume)
+                pygame.mixer.Channel(1).play(normal_shot_sound)
+            else:
+                selected_sound_effect_volume = 0.00
+                normal_shot_sound = pygame.mixer.Sound(NORMAL_SHOT_PATH)
+                pygame.mixer.Channel(1).set_volume(selected_sound_effect_volume)
+                pygame.mixer.Channel(1).play(normal_shot_sound)
+
+        normalized_sound_effect_volume = (selected_sound_effect_volume / 0.3) * 100
+        music_volume_percentage = font.render(f"{int(selected_music_volume * 100)}%", True, (0, 200, 0))
+        sound_effect_volume_percentage = font.render(f"{int(normalized_sound_effect_volume)}%", True, (0, 200, 0))
+
+        screen.blit(music_volume_percentage, (button_x2_coord + button_size["x"] + 25, button_y_coord + 10))  # Display next to music buttons
+        screen.blit(sound_effect_volume_percentage, (button_x2_coord + button_size["x"] + 25, button_y_coord + button_size["y"] + 20))  # Display next to sound effects buttons
+
+
+        pygame.display.flip()
+        clock.tick(60)    
+  
+
+

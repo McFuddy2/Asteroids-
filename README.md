@@ -11,7 +11,7 @@
         python3 main.py
 
 ## Overview
-**Asteroids** is an exciting game where you play as a ship navigating through an asteroid belt. Your mission is to survive as long as possible by shooting lasers at asteroids or avoiding them. 
+**Asteroids** is an exciting game where you play as a ship navigating through an asteroid belt. Your mission is to survive as long as possible by shooting lasers at asteroids or avoiding them. When you blow up an Asteroid, there is a chance to drop an item that can help or hurt you!
 
 ## Features
 - Control a ship in an asteroid field.
@@ -30,24 +30,19 @@
 - **ESCAPE**: Open/Close the pause menu
 
 ## Future Enhancements
-- Implementing power-ups
-- Adding background music
-- Implement multiple lives and respawning
+- Implement MORE power-ups
+    - Shield
+    - more Weapon mods
+- Implement Negative drops
+   - more Asteroid Boosts
 - Add an explosion effect for the asteroids
-- Add acceleration to the player movement
 - Make the objects wrap around the screen instead of disappearing
 - Add a background image
-- Create different weapon types
 - Make the asteroids lumpy instead of perfectly round
-- Add a shield power-up
-- Add a speed power-up
-- Add bombs that can be dropped
-- Add Options menu to change control settings and player colors
 
 ## Known Issues
 - Currently, there are no barriers, allowing players to fly off the screen.
-- No music is implemented yet.
-- the buttons within the options menu do nothing, they are entirely visual place holders.
+
 
 ## Acknowledgments
 Special thanks to **boot.dev** for providing the idea and the backbone of this project.
