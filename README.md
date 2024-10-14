@@ -45,7 +45,7 @@
 
 
 ## Acknowledgments
-Special thanks to **boot.dev** for providing the idea and the backbone of this project.
+Special thanks to **boot.dev** for providing the idea and the start of this project.
 
 ## Contact
 For any inquiries or feedback, please reach out to [CalvinGlennBurgess@gmail.com](mailto:CalvinGlennBurgess@gmail.com).

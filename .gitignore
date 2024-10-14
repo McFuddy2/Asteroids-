@@ -2,3 +2,6 @@ venv/
 __pycache__/
 halloffame.csv
 player_settings.csv
+game_settings.csv
+
+
